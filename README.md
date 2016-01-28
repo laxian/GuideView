@@ -1,7 +1,5 @@
 # GuideView
 新手引导视图，初次打开页面时显示。
-![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot1.jpeg)
-![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot2.jpeg)
 
 
 *使用图片
