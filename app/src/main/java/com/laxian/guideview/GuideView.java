@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,12 @@ import java.lang.reflect.Field;
  */
 public class GuideView extends RelativeLayout {
     private final String TAG = getClass().getSimpleName();
-    private int offsetX, offsetY;
+    private static final String SHOW_GUIDE_PRIFIX = "show_guide_on_view_";
     private Context mContent;
+    /**
+     * GuideView 偏移量
+     */
+    private int offsetX, offsetY;
     /**
      * targetView 的外切圆半径
      */
@@ -82,6 +85,14 @@ public class GuideView extends RelativeLayout {
      * targetView左上角坐标
      */
     private int[] location;
+
+    public int[] getLocation() {
+        return location;
+    }
+
+    public void setLocation(int[] location) {
+        this.location = location;
+    }
 
     public GuideView(Context context) {
         this(context, null);
@@ -157,7 +168,15 @@ public class GuideView extends RelativeLayout {
     }
 
     private String generateUniqId(View v) {
-        return "show_guide_on_target_view_" + v.getId();
+        return SHOW_GUIDE_PRIFIX + v.getId();
+    }
+
+    public int[] getCenter() {
+        return center;
+    }
+
+    public void setCenter(int[] center) {
+        this.center = center;
     }
 
     public void show() {
@@ -172,19 +191,22 @@ public class GuideView extends RelativeLayout {
                         isMeasured = true;
                     }
 
-                    // 获取右上角坐标
-                    location = new int[2];
-                    targetView.getLocationInWindow(location);
-                    // 获取中心坐标
-                    center = new int[2];
-                    center[0] = location[0] + targetView.getWidth() / 2;
-                    center[1] = location[1] + targetView.getHeight() / 2;
+                    // 获取targetView的圆心坐标
+                    if (center == null) {
+                        // 获取右上角坐标
+                        location = new int[2];
+                        targetView.getLocationInWindow(location);
+                        center = new int[2];
+                        // 获取中心坐标
+                        center[0] = location[0] + targetView.getWidth() / 2;
+                        center[1] = location[1] + targetView.getHeight() / 2;
+                    }
                     // 获取外切圆半径
                     if (radius == 0) {
                         radius = getTargetViewRadius();
                     }
-
-                    createView();
+                    // 添加GuideView
+                    createGuideView();
                 }
             });
         }
@@ -197,18 +219,18 @@ public class GuideView extends RelativeLayout {
      * 添加提示文字，位置在targetView的下边
      * 在屏幕窗口，添加蒙层，蒙层绘制总背景和透明圆形，圆形下边绘制说明文字
      */
-    private void createView() {
+    private void createGuideView() {
 
         // 添加到蒙层
-        RelativeLayout layout = new RelativeLayout(mContent);
+        RelativeLayout guideViewLayout = new RelativeLayout(mContent);
 
         // Tips布局参数
-        LayoutParams tipsViewParams;
-        tipsViewParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        tipsViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
+        LayoutParams guideViewParams;
+        guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
         if (customTipsView != null) {
 
-//            LayoutParams tipsViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (direction != null) {
                 int width = this.getWidth();
                 int height = this.getHeight();
@@ -220,45 +242,45 @@ public class GuideView extends RelativeLayout {
                 switch (direction) {
                     case TOP:
                         this.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-                        tipsViewParams.setMargins(offsetX, offsetY, 0 - offsetX, height - top - offsetY);
-                        Log.e("xxxx", height - top + "");
+                        guideViewParams.setMargins(offsetX, offsetY - height + top, 0 - offsetX, height - top - offsetY);
                         break;
                     case LEFT:
                         this.setGravity(Gravity.RIGHT);
-                        tipsViewParams.setMargins(offsetX, top + offsetY, width - left - offsetX, -offsetY);
-                        Log.e("xxxx", width - left + "");
+                        guideViewParams.setMargins(offsetX - width + left, top + offsetY, width - left - offsetX, -top - offsetY);
                         break;
                     case BOTTOM:
                         this.setGravity(Gravity.CENTER_HORIZONTAL);
-                        tipsViewParams.setMargins(offsetX, bottom + offsetY, -offsetX, -offsetY);
+                        guideViewParams.setMargins(offsetX, bottom + offsetY, -offsetX, -bottom - offsetY);
                         break;
                     case RIGHT:
-                        tipsViewParams.setMargins(right + offsetX, top + offsetY, 0 - offsetX, 0 - offsetY);
+                        guideViewParams.setMargins(right + offsetX, top + offsetY, -right - offsetX, -top - offsetY);
                         break;
                     case LEFT_TOP:
                         this.setGravity(Gravity.RIGHT | Gravity.BOTTOM);
-                        tipsViewParams.setMargins(offsetX, offsetY, width - left - offsetX, height - top - offsetY);
+                        guideViewParams.setMargins(offsetX - width + left, offsetY - height + top, width - left - offsetX, height - top - offsetY);
                         break;
                     case LEFT_BOTTOM:
                         this.setGravity(Gravity.RIGHT);
-                        tipsViewParams.setMargins(offsetX, bottom + offsetY, width - left - offsetX, -offsetY);
+                        guideViewParams.setMargins(offsetX - width + left, bottom + offsetY, width - left - offsetX, -bottom - offsetY);
                         break;
                     case RIGHT_TOP:
                         this.setGravity(Gravity.BOTTOM);
-                        tipsViewParams.setMargins(right + offsetX, offsetY, -offsetX, height - top - offsetY);
+                        guideViewParams.setMargins(right + offsetX, offsetY - height + top, -right - offsetX, height - top - offsetY);
                         break;
                     case RIGHT_BOTTOM:
-                        tipsViewParams.setMargins(right + offsetX, bottom + offsetY, 0, 0);
+                        guideViewParams.setMargins(right + offsetX, bottom + offsetY, -right - offsetX, -top - offsetY);
                         break;
                 }
             } else {
-                tipsViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                guideViewParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                guideViewParams.setMargins(offsetX, offsetY, -offsetX, -offsetY);
             }
 
-            layout.setLayoutParams(tipsViewParams);
-            layout.addView(customTipsView);
+            guideViewLayout.setLayoutParams(guideViewParams);
+            guideViewLayout.requestLayout();
+            guideViewLayout.addView(customTipsView);
 
-            this.addView(layout);
+            this.addView(guideViewLayout);
         }
     }
 
@@ -291,24 +313,6 @@ public class GuideView extends RelativeLayout {
         }
         return -1;
     }
-
-    private int getStatuBarHeight() {
-        Class<?> c = null;
-        Object obj = null;
-        Field field = null;
-        int x = 0, sbar = 0;
-        try {
-            c = Class.forName("com.android.internal.R$dimen");
-            obj = c.newInstance();
-            field = c.getField("status_bar_height");
-            x = Integer.parseInt(field.get(obj).toString());
-            sbar = getResources().getDimensionPixelSize(x);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-        return sbar;
-    }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -408,6 +412,11 @@ public class GuideView extends RelativeLayout {
 
         public static Builder setCustomTipsView(View view) {
             guiderView.setCustomTipsView(view);
+            return instance;
+        }
+
+        public static Builder setCenter(int X, int Y) {
+            guiderView.setCenter(new int[]{X, Y});
             return instance;
         }
 

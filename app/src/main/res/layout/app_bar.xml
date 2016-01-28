@@ -3,14 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:background="@color/colorPrimaryDark"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:gravity="center_vertical"
     >
 
     <ImageButton
         android:id="@+id/ib_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="@color/transparent"
         android:src="@mipmap/ic_launcher"/>
 
@@ -26,8 +27,8 @@
 
     <ImageButton
         android:id="@+id/ib_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:background="@color/transparent"
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_menu_moreoverflow"/>

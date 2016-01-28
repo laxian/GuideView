@@ -4,13 +4,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton menu;
+    private Button btnTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         menu = (ImageButton) findViewById(R.id.ib_menu);
+        btnTest = (Button) findViewById(R.id.btn_test);
 
     }
 
@@ -29,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         iv.setLayoutParams(params);
 
+//        TextView iv = new TextView(this);
+//        iv.setText("欢迎使用");
+//        iv.setTextColor(getResources().getColor(R.color.white));
+
 
         GuideView.Builder
                 .newInstance(this)
@@ -37,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
                 .setBackGround(getResources().getColor(R.color.shadow))
                 .setOnclickExit(null)
+                .setRadius(32)
+//                .setCenter(300, 300)
+                .setOffset(200, 60)
+//                .showOnce()
                 .build()
                 .show();
     }
