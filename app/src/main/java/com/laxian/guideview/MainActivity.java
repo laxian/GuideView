@@ -2,12 +2,10 @@ package com.laxian.guideview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,15 +25,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void setGuideView(View view) {
 
-        ImageView iv = new ImageView(this);
-        iv.setImageResource(R.drawable.img_new_task_guide);
+//        ImageView iv = new ImageView(this);
+//        iv.setImageResource(R.drawable.img_new_task_guide);
+//
+//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        iv.setLayoutParams(params);
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        iv.setLayoutParams(params);
-
-//        TextView iv = new TextView(this);
-//        iv.setText("欢迎使用");
-//        iv.setTextColor(getResources().getColor(R.color.white));
+        TextView iv = new TextView(this);
+        iv.setText("欢迎使用");
+        iv.setTextColor(getResources().getColor(R.color.white));
+        iv.setTextSize(30);
+        iv.setGravity(Gravity.CENTER);
 
 
         GuideView.Builder
@@ -45,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
                 .setBackGround(getResources().getColor(R.color.shadow))
                 .setOnclickExit(null)
-                .setRadius(32)
+                .setRadius(48)
 //                .setCenter(300, 300)
-                .setOffset(200, 60)
+//                .setOffset(0, 60)
 //                .showOnce()
                 .build()
                 .show();

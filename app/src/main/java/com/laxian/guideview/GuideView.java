@@ -16,8 +16,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import java.lang.reflect.Field;
-
 /**
  * Created by zhouweixian on 2016/1/23.
  */
@@ -33,10 +31,6 @@ public class GuideView extends RelativeLayout {
      * targetView 的外切圆半径
      */
     private int radius;
-    /**
-     * 提示语
-     */
-    private String tips;
     /**
      * 需要显示提示信息的View
      */
@@ -348,10 +342,6 @@ public class GuideView extends RelativeLayout {
         canvas.drawBitmap(bitmap, 0, 0, bgPaint);
     }
 
-    public void setTips(String tips) {
-        this.tips = tips;
-    }
-
     enum Direction {
         LEFT, TOP, RIGHT, BOTTOM,
         LEFT_TOP, LEFT_BOTTOM,
@@ -386,11 +376,6 @@ public class GuideView extends RelativeLayout {
 
         public static Builder setBackGround(int color) {
             guiderView.setBackground_color(color);
-            return instance;
-        }
-
-        public static Builder setTips(String tips) {
-            guiderView.setTips(tips);
             return instance;
         }
 

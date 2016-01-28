@@ -1,22 +1,26 @@
 # GuideView
-新手引导视图
+新手引导视图，初次打开页面时显示。
 
-##使用方法：
 
-    ###使用图片
+*使用图片
+
+
         ImageView iv = new ImageView(this);
         iv.setImageResource(R.drawable.img_new_task_guide);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         iv.setLayoutParams(params);
 
 
-或者
-    ###使用文字
+*使用文字
+
         TextView iv = new TextView(this);
         iv.setText("欢迎使用");
         iv.setTextColor(getResources().getColor(R.color.white));
+        
+        
 
-    ###显示GuideView
+*显示GuideView
+
         GuideView.Builder
                 .newInstance(this)      // 必须调用
                 .setTargetView(view)    // 必须调用，设置需要Guide的View
