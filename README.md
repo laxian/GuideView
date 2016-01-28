@@ -7,9 +7,11 @@
 
         ImageView iv = new ImageView(this);
         iv.setImageResource(R.drawable.img_new_task_guide);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         iv.setLayoutParams(params);
 
+![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot1.jpeg)
 
 *使用文字
 
@@ -17,7 +19,7 @@
         iv.setText("欢迎使用");
         iv.setTextColor(getResources().getColor(R.color.white));
         
-        
+![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot2.jpeg)
 
 *显示GuideView
 
