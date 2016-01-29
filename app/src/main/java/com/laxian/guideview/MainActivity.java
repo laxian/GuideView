@@ -2,11 +2,16 @@ package com.laxian.guideview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,26 +30,33 @@ public class MainActivity extends AppCompatActivity {
 
     private void setGuideView(View view) {
 
-//        ImageView iv = new ImageView(this);
-//        iv.setImageResource(R.drawable.img_new_task_guide);
-//
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//        iv.setLayoutParams(params);
+        // 使用图片
+        ImageView iv = new ImageView(this);
+        iv.setImageResource(R.drawable.img_new_task_guide);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        iv.setLayoutParams(params);
 
-        TextView iv = new TextView(this);
-        iv.setText("欢迎使用");
-        iv.setTextColor(getResources().getColor(R.color.white));
-        iv.setTextSize(30);
-        iv.setGravity(Gravity.CENTER);
+        // 使用文字
+        TextView tv = new TextView(this);
+        tv.setText("欢迎使用");
+        tv.setTextColor(getResources().getColor(R.color.white));
+        tv.setTextSize(30);
+        tv.setGravity(Gravity.CENTER);
 
 
         GuideView.Builder
                 .newInstance(this)
                 .setTargetView(view)
-                .setCustomTipsView(iv)
+                .setCustomTipsView(tv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBackGround(getResources().getColor(R.color.shadow))
-                .setOnclickExit(null)
+                .setBgColor(getResources().getColor(R.color.shadow))
+                .setOnclickExit(true)
+                .setOnclickListener(new GuideView.OnClickCallback() {
+                    @Override
+                    public void onClickedGuideView() {
+                        Toast.makeText(MainActivity.this, "欢迎使用", Toast.LENGTH_SHORT).show();
+                    }
+                })
                 .setRadius(48)
 //                .setCenter(300, 300)
 //                .setOffset(0, 60)

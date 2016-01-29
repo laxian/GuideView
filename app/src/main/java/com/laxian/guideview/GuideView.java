@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +19,11 @@ import android.widget.RelativeLayout;
  */
 public class GuideView extends RelativeLayout {
     private final String TAG = getClass().getSimpleName();
-    private static final String SHOW_GUIDE_PRIFIX = "show_guide_on_view_";
     private Context mContent;
+    /**
+     * targetView前缀。SHOW_GUIDE_PREFIX + targetView.getId()作为保存在SP文件的key。
+     */
+    private static final String SHOW_GUIDE_PREFIX = "show_guide_on_view_";
     /**
      * GuideView 偏移量
      */
@@ -79,6 +80,8 @@ public class GuideView extends RelativeLayout {
      * targetView左上角坐标
      */
     private int[] location;
+    private boolean onClickExit;
+    private OnClickCallback onclickListener;
 
     public int[] getLocation() {
         return location;
@@ -89,11 +92,7 @@ public class GuideView extends RelativeLayout {
     }
 
     public GuideView(Context context) {
-        this(context, null);
-    }
-
-    public GuideView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        super(context);
         this.mContent = context;
         init();
     }
@@ -122,15 +121,7 @@ public class GuideView extends RelativeLayout {
         this.customTipsView = customTipsView;
     }
 
-    public int getBackgroundColor() {
-        return backgroundColor;
-    }
-
-    public void setBackgroundColor(String backgroundColor) {
-        this.backgroundColor = Color.parseColor(backgroundColor);
-    }
-
-    public void setBackground_color(int background_color) {
+    public void setBgColor(int background_color) {
         this.backgroundColor = background_color;
     }
 
@@ -142,27 +133,22 @@ public class GuideView extends RelativeLayout {
         this.targetView = targetView;
     }
 
-    public PorterDuffXfermode getPorterDuffXfermode() {
-        return porterDuffXfermode;
-    }
-
-    public void setPorterDuffXfermode(PorterDuffXfermode porterDuffXfermode) {
-        this.porterDuffXfermode = porterDuffXfermode;
-    }
-
     private void init() {
     }
 
     public void showOnce() {
-        mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).commit();
+        if (targetView != null) {
+            mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).commit();
+        }
     }
 
     private boolean hasShown() {
+        if (targetView == null) return true;
         return mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).getBoolean(generateUniqId(targetView), false);
     }
 
     private String generateUniqId(View v) {
-        return SHOW_GUIDE_PRIFIX + v.getId();
+        return SHOW_GUIDE_PREFIX + v.getId();
     }
 
     public int[] getCenter() {
@@ -173,8 +159,13 @@ public class GuideView extends RelativeLayout {
         this.center = center;
     }
 
+    public void hide() {
+        this.setVisibility(GONE);
+    }
+
     public void show() {
         if (hasShown()) return;
+
         if (targetView != null) {
             targetView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -185,7 +176,7 @@ public class GuideView extends RelativeLayout {
                         isMeasured = true;
                     }
 
-                    // 获取targetView的圆心坐标
+                    // 获取targetView的中心坐标
                     if (center == null) {
                         // 获取右上角坐标
                         location = new int[2];
@@ -195,7 +186,7 @@ public class GuideView extends RelativeLayout {
                         center[0] = location[0] + targetView.getWidth() / 2;
                         center[1] = location[1] + targetView.getHeight() / 2;
                     }
-                    // 获取外切圆半径
+                    // 获取targetView外切圆半径
                     if (radius == 0) {
                         radius = getTargetViewRadius();
                     }
@@ -222,6 +213,7 @@ public class GuideView extends RelativeLayout {
         LayoutParams guideViewParams;
         guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
+
         if (customTipsView != null) {
 
 //            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -236,7 +228,7 @@ public class GuideView extends RelativeLayout {
                 switch (direction) {
                     case TOP:
                         this.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
-                        guideViewParams.setMargins(offsetX, offsetY - height + top, 0 - offsetX, height - top - offsetY);
+                        guideViewParams.setMargins(offsetX, offsetY - height + top, -offsetX, height - top - offsetY);
                         break;
                     case LEFT:
                         this.setGravity(Gravity.RIGHT);
@@ -270,11 +262,9 @@ public class GuideView extends RelativeLayout {
                 guideViewParams.setMargins(offsetX, offsetY, -offsetX, -offsetY);
             }
 
-            guideViewLayout.setLayoutParams(guideViewParams);
-            guideViewLayout.requestLayout();
             guideViewLayout.addView(customTipsView);
 
-            this.addView(guideViewLayout);
+            this.addView(guideViewLayout, guideViewParams);
         }
     }
 
@@ -342,12 +332,26 @@ public class GuideView extends RelativeLayout {
         canvas.drawBitmap(bitmap, 0, 0, bgPaint);
     }
 
+    public void setOnClickExit(boolean onClickExit) {
+        this.onClickExit = onClickExit;
+    }
+
+    public void setOnclickListener(OnClickCallback onclickListener) {
+        this.onclickListener = onclickListener;
+    }
+
+    /**
+     * 定义GuideView相对于targetView的方位，共八种。不设置则默认在targetView下方
+     */
     enum Direction {
         LEFT, TOP, RIGHT, BOTTOM,
         LEFT_TOP, LEFT_BOTTOM,
         RIGHT_TOP, RIGHT_BOTTOM
     }
 
+    /**
+     * GuideView点击Callback
+     */
     interface OnClickCallback {
         void onClickedGuideView();
     }
@@ -369,62 +373,75 @@ public class GuideView extends RelativeLayout {
             return instance;
         }
 
-        public static Builder setTargetView(View target) {
+        public  Builder setTargetView(View target) {
             guiderView.setTargetView(target);
             return instance;
         }
 
-        public static Builder setBackGround(int color) {
-            guiderView.setBackground_color(color);
+        public  Builder setBgColor(int color) {
+            guiderView.setBgColor(color);
             return instance;
         }
 
-        public static Builder setDirction(Direction dir) {
+        public  Builder setDirction(Direction dir) {
             guiderView.setDirection(dir);
             return instance;
         }
 
-        public static Builder setOffset(int x, int y) {
+        public  Builder setOffset(int x, int y) {
             guiderView.setOffsetX(x);
             guiderView.setOffsetY(y);
             return instance;
         }
 
-        public static Builder setRadius(int radius) {
+        public  Builder setRadius(int radius) {
             guiderView.setRadius(radius);
             return instance;
         }
 
-        public static Builder setCustomTipsView(View view) {
+        public  Builder setCustomTipsView(View view) {
             guiderView.setCustomTipsView(view);
             return instance;
         }
 
-        public static Builder setCenter(int X, int Y) {
+        public  Builder setCenter(int X, int Y) {
             guiderView.setCenter(new int[]{X, Y});
             return instance;
         }
 
-        public static Builder showOnce() {
+        public  Builder showOnce() {
             guiderView.showOnce();
             return instance;
         }
 
-        public static GuideView build() {
+        public  GuideView build() {
+            guiderView.build();
             return guiderView;
         }
 
-        public static Builder setOnclickExit(final OnClickCallback callback) {
-            guiderView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    guiderView.setVisibility(GONE);
-                    if (callback != null) {
-                        callback.onClickedGuideView();
-                    }
-                }
-            });
+        public  Builder setOnclickExit(boolean onclickExit) {
+            guiderView.setOnClickExit(onclickExit);
             return instance;
         }
+
+        public  Builder setOnclickListener(final OnClickCallback callback) {
+            guiderView.setOnclickListener(callback);
+            return instance;
+        }
+    }
+
+    private void build() {
+        final boolean exit = onClickExit;
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onclickListener != null) {
+                    onclickListener.onClickedGuideView();
+                }
+                if (exit) {
+                    hide();
+                }
+            }
+        });
     }
 }
