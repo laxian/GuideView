@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +16,16 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+import java.util.List;
+
 /**
  * Created by zhouweixian on 2016/1/23.
  */
 public class GuideView extends RelativeLayout {
     private final String TAG = getClass().getSimpleName();
     private Context mContent;
+    private List<View> mViews;
+    private boolean first = true;
     /**
      * targetView前缀。SHOW_GUIDE_PREFIX + targetView.getId()作为保存在SP文件的key。
      */
@@ -39,7 +45,7 @@ public class GuideView extends RelativeLayout {
     /**
      * 自定义View
      */
-    private View customTipsView;
+    private View customGuideView;
     /**
      * 透明圆形画笔
      */
@@ -82,6 +88,25 @@ public class GuideView extends RelativeLayout {
     private int[] location;
     private boolean onClickExit;
     private OnClickCallback onclickListener;
+    private RelativeLayout guideViewLayout;
+
+    public void restoreState() {
+        offsetX = offsetY = 0;
+        radius = 0;
+        mCirclePaint = null;
+        mBackgroundPaint = null;
+        isMeasured = false;
+        center = null;
+        porterDuffXfermode = null;
+        bitmap = null;
+        backgroundColor = Color.parseColor("#00000000");
+        temp = null;
+        direction = null;
+
+        ((FrameLayout) ((Activity) mContent).getWindow().getDecorView()).removeView(this);
+        this.removeAllViews();
+
+    }
 
     public int[] getLocation() {
         return location;
@@ -117,8 +142,11 @@ public class GuideView extends RelativeLayout {
         this.direction = direction;
     }
 
-    public void setCustomTipsView(View customTipsView) {
-        this.customTipsView = customTipsView;
+    public void setCustomGuideView(View customGuideView) {
+        this.customGuideView = customGuideView;
+        if (!first) {
+            restoreState();
+        }
     }
 
     public void setBgColor(int background_color) {
@@ -131,6 +159,10 @@ public class GuideView extends RelativeLayout {
 
     public void setTargetView(View targetView) {
         this.targetView = targetView;
+        restoreState();
+        if (!first) {
+            guideViewLayout.removeAllViews();
+        }
     }
 
     private void init() {
@@ -164,6 +196,7 @@ public class GuideView extends RelativeLayout {
     }
 
     public void show() {
+        Log.v(TAG, "show");
         if (hasShown()) return;
 
         if (targetView != null) {
@@ -197,7 +230,9 @@ public class GuideView extends RelativeLayout {
         }
 
         this.setBackgroundResource(R.color.transparent);
+
         ((FrameLayout) ((Activity) mContent).getWindow().getDecorView()).addView(this);
+        first = false;
     }
 
     /**
@@ -205,16 +240,19 @@ public class GuideView extends RelativeLayout {
      * 在屏幕窗口，添加蒙层，蒙层绘制总背景和透明圆形，圆形下边绘制说明文字
      */
     private void createGuideView() {
+        Log.v(TAG, "createGuideView");
 
         // 添加到蒙层
-        RelativeLayout guideViewLayout = new RelativeLayout(mContent);
+        if (guideViewLayout == null) {
+            guideViewLayout = new RelativeLayout(mContent);
+        }
 
         // Tips布局参数
         LayoutParams guideViewParams;
         guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
 
-        if (customTipsView != null) {
+        if (customGuideView != null) {
 
 //            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (direction != null) {
@@ -262,7 +300,7 @@ public class GuideView extends RelativeLayout {
                 guideViewParams.setMargins(offsetX, offsetY, -offsetX, -offsetY);
             }
 
-            guideViewLayout.addView(customTipsView);
+            guideViewLayout.addView(customGuideView);
 
             this.addView(guideViewLayout, guideViewParams);
         }
@@ -301,6 +339,9 @@ public class GuideView extends RelativeLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.v(TAG, "onDraw");
+
+        if (!isMeasured) return;
 
         if (targetView == null) return;
 
@@ -338,6 +379,21 @@ public class GuideView extends RelativeLayout {
 
     public void setOnclickListener(OnClickCallback onclickListener) {
         this.onclickListener = onclickListener;
+    }
+
+    private void setClickInfo() {
+        final boolean exit = onClickExit;
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onclickListener != null) {
+                    onclickListener.onClickedGuideView();
+                }
+                if (exit) {
+                    hide();
+                }
+            }
+        });
     }
 
     /**
@@ -399,8 +455,8 @@ public class GuideView extends RelativeLayout {
             return instance;
         }
 
-        public  Builder setCustomTipsView(View view) {
-            guiderView.setCustomTipsView(view);
+        public  Builder setCustomGuideView(View view) {
+            guiderView.setCustomGuideView(view);
             return instance;
         }
 
@@ -415,7 +471,7 @@ public class GuideView extends RelativeLayout {
         }
 
         public  GuideView build() {
-            guiderView.build();
+            guiderView.setClickInfo();
             return guiderView;
         }
 
@@ -428,20 +484,5 @@ public class GuideView extends RelativeLayout {
             guiderView.setOnclickListener(callback);
             return instance;
         }
-    }
-
-    private void build() {
-        final boolean exit = onClickExit;
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onclickListener != null) {
-                    onclickListener.onClickedGuideView();
-                }
-                if (exit) {
-                    hide();
-                }
-            }
-        });
     }
 }
