@@ -192,7 +192,11 @@ public class GuideView extends RelativeLayout {
     }
 
     public void hide() {
-        this.setVisibility(GONE);
+        if (guideViewLayout != null) {
+            guideViewLayout.removeAllViews();
+            this.removeAllViews();
+            ((FrameLayout) ((Activity) mContent).getWindow().getDecorView()).removeView(this);
+        }
     }
 
     public void show() {
@@ -336,12 +340,16 @@ public class GuideView extends RelativeLayout {
         return -1;
     }
 
+    boolean needDraw = true;
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.v(TAG, "onDraw");
 
         if (!isMeasured) return;
+
+//        if (!needDraw) return;
+//        needDraw = false;
 
         if (targetView == null) return;
 

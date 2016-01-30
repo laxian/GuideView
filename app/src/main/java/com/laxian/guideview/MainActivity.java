@@ -5,19 +5,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton menu;
     private Button btnTest;
+    private Button btnTest2;
     GuideView guideView = null;
 
     Handler mHandler = new Handler() {
@@ -26,13 +25,16 @@ public class MainActivity extends AppCompatActivity {
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    guideView.setTargetView((View)msg.obj);
-                    guideView.setDirection(GuideView.Direction.BOTTOM);
-                    guideView.show();
+                    guideView2.show();
+                    break;
+                case 2:
+                    guideView3.show();
                     break;
             }
         }
     };
+    private GuideView guideView3;
+    private GuideView guideView2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +43,11 @@ public class MainActivity extends AppCompatActivity {
 
         menu = (ImageButton) findViewById(R.id.ib_menu);
         btnTest = (Button) findViewById(R.id.btn_test);
+        btnTest2 = (Button) findViewById(R.id.btn_test2);
 
     }
 
-    private void setGuideView(View view) {
+    private void setGuideView() {
 
         // 使用图片
         final ImageView iv = new ImageView(this);
@@ -59,26 +62,60 @@ public class MainActivity extends AppCompatActivity {
         tv.setTextSize(30);
         tv.setGravity(Gravity.CENTER);
 
+        // 使用文字
+        final TextView tv2 = new TextView(this);
+        tv2.setText("欢迎使用2");
+        tv2.setTextColor(getResources().getColor(R.color.white));
+        tv2.setTextSize(30);
+        tv2.setGravity(Gravity.CENTER);
+
 
         guideView = GuideView.Builder
                 .newInstance(this)
-                .setTargetView(view)
-                .setCustomGuideView(tv)
+                .setTargetView(menu)
+                .setCustomGuideView(iv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
                 .setBgColor(getResources().getColor(R.color.shadow))
-//                .setOnclickExit(true)
                 .setOnclickListener(new GuideView.OnClickCallback() {
                     @Override
                     public void onClickedGuideView() {
+                        guideView.hide();
                         Message msg = mHandler.obtainMessage(1);
-                        msg.obj = menu;
                         mHandler.sendMessage(msg);
                     }
                 })
-                .setRadius(48)
-//                .setCenter(300, 300)
-//                .setOffset(0, 60)
-//                .showOnce()
+                .build();
+
+
+        guideView2 = GuideView.Builder
+                .newInstance(this)
+                .setTargetView(btnTest)
+                .setCustomGuideView(tv)
+                .setDirction(GuideView.Direction.LEFT_BOTTOM)
+                .setBgColor(getResources().getColor(R.color.shadow))
+                .setOnclickListener(new GuideView.OnClickCallback() {
+                    @Override
+                    public void onClickedGuideView() {
+                        guideView2.hide();
+                        Message msg = mHandler.obtainMessage(2);
+                        mHandler.sendMessage(msg);
+                    }
+                })
+                .build();
+
+
+        guideView3 = GuideView.Builder
+                .newInstance(this)
+                .setTargetView(btnTest2)
+                .setCustomGuideView(tv2)
+                .setDirction(GuideView.Direction.LEFT_BOTTOM)
+                .setBgColor(getResources().getColor(R.color.shadow))
+                .setOnclickListener(new GuideView.OnClickCallback() {
+                    @Override
+                    public void onClickedGuideView() {
+                        guideView3.hide();
+                    }
+                })
                 .build();
         guideView.show();
     }
@@ -86,6 +123,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setGuideView(btnTest);
+        setGuideView();
     }
 }
