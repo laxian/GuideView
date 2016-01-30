@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * Created by zhouweixian on 2016/1/23.
  */
-public class GuideView extends RelativeLayout {
+public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlobalLayoutListener {
     private final String TAG = getClass().getSimpleName();
     private Context mContent;
     private List<View> mViews;
@@ -91,6 +90,7 @@ public class GuideView extends RelativeLayout {
     private RelativeLayout guideViewLayout;
 
     public void restoreState() {
+        Log.v(TAG, "restoreState");
         offsetX = offsetY = 0;
         radius = 0;
         mCirclePaint = null;
@@ -99,12 +99,10 @@ public class GuideView extends RelativeLayout {
         center = null;
         porterDuffXfermode = null;
         bitmap = null;
-        backgroundColor = Color.parseColor("#00000000");
+        needDraw = true;
+//        backgroundColor = Color.parseColor("#00000000");
         temp = null;
-        direction = null;
-
-        ((FrameLayout) ((Activity) mContent).getWindow().getDecorView()).removeView(this);
-        this.removeAllViews();
+//        direction = null;
 
     }
 
@@ -159,9 +157,9 @@ public class GuideView extends RelativeLayout {
 
     public void setTargetView(View targetView) {
         this.targetView = targetView;
-        restoreState();
+//        restoreState();
         if (!first) {
-            guideViewLayout.removeAllViews();
+//            guideViewLayout.removeAllViews();
         }
     }
 
@@ -192,10 +190,12 @@ public class GuideView extends RelativeLayout {
     }
 
     public void hide() {
-        if (guideViewLayout != null) {
-            guideViewLayout.removeAllViews();
+        Log.v(TAG, "hide");
+        if (customGuideView != null) {
+            targetView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             this.removeAllViews();
             ((FrameLayout) ((Activity) mContent).getWindow().getDecorView()).removeView(this);
+            restoreState();
         }
     }
 
@@ -204,33 +204,7 @@ public class GuideView extends RelativeLayout {
         if (hasShown()) return;
 
         if (targetView != null) {
-            targetView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (isMeasured)
-                        return;
-                    if (targetView.getHeight() > 0 && targetView.getWidth() > 0) {
-                        isMeasured = true;
-                    }
-
-                    // 获取targetView的中心坐标
-                    if (center == null) {
-                        // 获取右上角坐标
-                        location = new int[2];
-                        targetView.getLocationInWindow(location);
-                        center = new int[2];
-                        // 获取中心坐标
-                        center[0] = location[0] + targetView.getWidth() / 2;
-                        center[1] = location[1] + targetView.getHeight() / 2;
-                    }
-                    // 获取targetView外切圆半径
-                    if (radius == 0) {
-                        radius = getTargetViewRadius();
-                    }
-                    // 添加GuideView
-                    createGuideView();
-                }
-            });
+            targetView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         }
 
         this.setBackgroundResource(R.color.transparent);
@@ -247,16 +221,16 @@ public class GuideView extends RelativeLayout {
         Log.v(TAG, "createGuideView");
 
         // 添加到蒙层
-        if (guideViewLayout == null) {
-            guideViewLayout = new RelativeLayout(mContent);
-        }
+//        if (guideViewLayout == null) {
+//            guideViewLayout = new RelativeLayout(mContent);
+//        }
 
         // Tips布局参数
         LayoutParams guideViewParams;
         guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
+            guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
 
-        if (customGuideView != null) {
+            if (customGuideView != null) {
 
 //            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (direction != null) {
@@ -304,9 +278,9 @@ public class GuideView extends RelativeLayout {
                 guideViewParams.setMargins(offsetX, offsetY, -offsetX, -offsetY);
             }
 
-            guideViewLayout.addView(customGuideView);
+//            guideViewLayout.addView(customGuideView);
 
-            this.addView(guideViewLayout, guideViewParams);
+            this.addView(customGuideView, guideViewParams);
         }
     }
 
@@ -348,11 +322,17 @@ public class GuideView extends RelativeLayout {
 
         if (!isMeasured) return;
 
-//        if (!needDraw) return;
-//        needDraw = false;
-
         if (targetView == null) return;
 
+//        if (!needDraw) return;
+
+        drawBackground(canvas);
+
+    }
+
+    private void drawBackground(Canvas canvas) {
+        Log.v(TAG, "drawBackground");
+        needDraw = false;
         // 先绘制bitmap，再将bitmap绘制到屏幕
         if (bitmap == null) {
             bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
@@ -371,10 +351,9 @@ public class GuideView extends RelativeLayout {
 
         // targetView 的透明圆形画笔
         if (mCirclePaint == null) mCirclePaint = new Paint();
-        porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+        porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT);// 或者CLEAR
         mCirclePaint.setXfermode(porterDuffXfermode);
-        mCirclePaint.setColor(getResources().getColor(R.color.Red_800));
-        mCirclePaint.setAntiAlias(true);// 设置画笔的锯齿效果。 true是去除，大家一看效果就明白了
+        mCirclePaint.setAntiAlias(true);
         temp.drawCircle(center[0], center[1], radius, mCirclePaint);
 
         // 绘制到屏幕
@@ -402,6 +381,32 @@ public class GuideView extends RelativeLayout {
                 }
             }
         });
+    }
+
+    @Override
+    public void onGlobalLayout() {
+        if (isMeasured)
+            return;
+        if (targetView.getHeight() > 0 && targetView.getWidth() > 0) {
+            isMeasured = true;
+        }
+
+        // 获取targetView的中心坐标
+        if (center == null) {
+            // 获取右上角坐标
+            location = new int[2];
+            targetView.getLocationInWindow(location);
+            center = new int[2];
+            // 获取中心坐标
+            center[0] = location[0] + targetView.getWidth() / 2;
+            center[1] = location[1] + targetView.getHeight() / 2;
+        }
+        // 获取targetView外切圆半径
+        if (radius == 0) {
+            radius = getTargetViewRadius();
+        }
+        // 添加GuideView
+        createGuideView();
     }
 
     /**

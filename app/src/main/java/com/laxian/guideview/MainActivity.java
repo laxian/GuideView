@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -44,6 +45,13 @@ public class MainActivity extends AppCompatActivity {
         menu = (ImageButton) findViewById(R.id.ib_menu);
         btnTest = (Button) findViewById(R.id.btn_test);
         btnTest2 = (Button) findViewById(R.id.btn_test2);
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                guideView.show();
+            }
+        });
 
     }
 
@@ -114,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClickedGuideView() {
                         guideView3.hide();
+                        guideView.show();
                     }
                 })
                 .build();
