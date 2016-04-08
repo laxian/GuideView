@@ -18,22 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton menu;
     private Button btnTest;
     private Button btnTest2;
-    GuideView guideView = null;
-
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    guideView2.show();
-                    break;
-                case 2:
-                    guideView3.show();
-                    break;
-            }
-        }
-    };
+    private GuideView guideView;
     private GuideView guideView3;
     private GuideView guideView2;
 
@@ -45,13 +30,6 @@ public class MainActivity extends AppCompatActivity {
         menu = (ImageButton) findViewById(R.id.ib_menu);
         btnTest = (Button) findViewById(R.id.btn_test);
         btnTest2 = (Button) findViewById(R.id.btn_test2);
-
-        btnTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                guideView.show();
-            }
-        });
 
     }
 
@@ -88,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClickedGuideView() {
                         guideView.hide();
-                        Message msg = mHandler.obtainMessage(1);
-                        mHandler.sendMessage(msg);
+                        guideView2.show();
                     }
                 })
                 .build();
@@ -105,8 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClickedGuideView() {
                         guideView2.hide();
-                        Message msg = mHandler.obtainMessage(2);
-                        mHandler.sendMessage(msg);
+                        guideView3.show();
                     }
                 })
                 .build();

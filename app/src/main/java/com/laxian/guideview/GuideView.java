@@ -334,10 +334,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         Log.v(TAG, "drawBackground");
         needDraw = false;
         // 先绘制bitmap，再将bitmap绘制到屏幕
-        if (bitmap == null) {
             bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
             temp = new Canvas(bitmap);
-        }
 
         // 背景画笔
         Paint bgPaint = new Paint();
@@ -358,6 +356,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
         // 绘制到屏幕
         canvas.drawBitmap(bitmap, 0, 0, bgPaint);
+        bitmap.recycle();
     }
 
     public void setOnClickExit(boolean onClickExit) {
