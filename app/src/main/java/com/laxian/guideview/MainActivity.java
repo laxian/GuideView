@@ -1,11 +1,8 @@
 package com.laxian.guideview;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -78,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 .setCustomGuideView(tv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
                 .setBgColor(getResources().getColor(R.color.shadow))
+                .setDrawRec()
                 .setOnclickListener(new GuideView.OnClickCallback() {
                     @Override
                     public void onClickedGuideView() {

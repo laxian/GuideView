@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -88,6 +89,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private boolean onClickExit;
     private OnClickCallback onclickListener;
     private RelativeLayout guideViewLayout;
+    private boolean mShowOnce;
+    private android.graphics.Rect mTargetViewRect;
+    private boolean mDrawRect;
+    private Paint mRectPaint;
 
     public void restoreState() {
         Log.v(TAG, "restoreState");
@@ -164,11 +169,12 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     }
 
     private void init() {
+        mTargetViewRect = new Rect();
     }
 
     public void showOnce() {
         if (targetView != null) {
-            mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).commit();
+            mShowOnce = true;
         }
     }
 
@@ -178,7 +184,12 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     }
 
     private String generateUniqId(View v) {
-        return SHOW_GUIDE_PREFIX + v.getId();
+        if (v.getId() > 0)
+            return SHOW_GUIDE_PREFIX + mContent.getClass().getSimpleName() + "_" + v.getId();
+        else if (v.getTag() != null)
+            return SHOW_GUIDE_PREFIX + v.getTag();
+        else
+            return SHOW_GUIDE_PREFIX + mContent.getClass().getSimpleName();
     }
 
     public int[] getCenter() {
@@ -202,6 +213,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     public void show() {
         Log.v(TAG, "show");
         if (hasShown()) return;
+
+        if (mShowOnce) {
+            mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).commit();
+        }
 
         if (targetView != null) {
             targetView.getViewTreeObserver().addOnGlobalLayoutListener(this);
@@ -228,19 +243,30 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         // Tips布局参数
         LayoutParams guideViewParams;
         guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-            guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
+        guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
 
-            if (customGuideView != null) {
+        if (customGuideView != null) {
 
 //            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (direction != null) {
                 int width = this.getWidth();
                 int height = this.getHeight();
 
-                int left = center[0] - radius;
-                int right = center[0] + radius;
-                int top = center[1] - radius;
-                int bottom = center[1] + radius;
+                int left;
+                int right;
+                int top;
+                int bottom;
+                if (!mDrawRect) {
+                    left = center[0] - radius;
+                    right = center[0] + radius;
+                    top = center[1] - radius;
+                    bottom = center[1] + radius;
+                } else {
+                    left = mTargetViewRect.left;
+                    right = mTargetViewRect.right;
+                    top = mTargetViewRect.top;
+                    bottom = mTargetViewRect.bottom;
+                }
                 switch (direction) {
                     case TOP:
                         this.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
@@ -334,8 +360,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         Log.v(TAG, "drawBackground");
         needDraw = false;
         // 先绘制bitmap，再将bitmap绘制到屏幕
-            bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
-            temp = new Canvas(bitmap);
+        bitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+        temp = new Canvas(bitmap);
 
         // 背景画笔
         Paint bgPaint = new Paint();
@@ -347,12 +373,21 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         // 绘制屏幕背景
         temp.drawRect(0, 0, temp.getWidth(), temp.getHeight(), bgPaint);
 
-        // targetView 的透明圆形画笔
-        if (mCirclePaint == null) mCirclePaint = new Paint();
-        porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_OUT);// 或者CLEAR
-        mCirclePaint.setXfermode(porterDuffXfermode);
-        mCirclePaint.setAntiAlias(true);
-        temp.drawCircle(center[0], center[1], radius, mCirclePaint);
+        if (!mDrawRect) {
+            // targetView 的透明圆形画笔
+            if (mCirclePaint == null) mCirclePaint = new Paint();
+            porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+            mCirclePaint.setXfermode(porterDuffXfermode);
+            mCirclePaint.setAntiAlias(true);
+            temp.drawCircle(center[0], center[1], radius, mCirclePaint);
+        } else {
+            // targetView 的透明矩形画笔
+            if (mRectPaint == null) mRectPaint = new Paint();
+            porterDuffXfermode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
+            mRectPaint.setXfermode(porterDuffXfermode);
+            mRectPaint.setAntiAlias(true);
+            temp.drawRect(mTargetViewRect, mRectPaint);
+        }
 
         // 绘制到屏幕
         canvas.drawBitmap(bitmap, 0, 0, bgPaint);
@@ -395,6 +430,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
             // 获取右上角坐标
             location = new int[2];
             targetView.getLocationInWindow(location);
+            targetView.getGlobalVisibleRect(mTargetViewRect);
             center = new int[2];
             // 获取中心坐标
             center[0] = location[0] + targetView.getWidth() / 2;
@@ -408,10 +444,14 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         createGuideView();
     }
 
+    private void setDrawRect() {
+        mDrawRect = true;
+    }
+
     /**
      * 定义GuideView相对于targetView的方位，共八种。不设置则默认在targetView下方
      */
-    enum Direction {
+    public enum Direction {
         LEFT, TOP, RIGHT, BOTTOM,
         LEFT_TOP, LEFT_BOTTOM,
         RIGHT_TOP, RIGHT_BOTTOM
@@ -420,7 +460,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     /**
      * GuideView点击Callback
      */
-    interface OnClickCallback {
+    public interface OnClickCallback {
         void onClickedGuideView();
     }
 
@@ -453,6 +493,11 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
         public  Builder setDirction(Direction dir) {
             guiderView.setDirection(dir);
+            return instance;
+        }
+
+        public  Builder setDrawRec() {
+            guiderView.setDrawRect();
             return instance;
         }
 
@@ -498,3 +543,4 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         }
     }
 }
+
