@@ -235,19 +235,12 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private void createGuideView() {
         Log.v(TAG, "createGuideView");
 
-        // 添加到蒙层
-//        if (guideViewLayout == null) {
-//            guideViewLayout = new RelativeLayout(mContent);
-//        }
-
-        // Tips布局参数
+        // 引导图布局参数
         LayoutParams guideViewParams;
         guideViewParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        guideViewParams.setMargins(0, center[1] + radius + 10, 0, 0);
 
         if (customGuideView != null) {
 
-//            LayoutParams guideViewParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             if (direction != null) {
                 int width = this.getWidth();
                 int height = this.getHeight();
@@ -300,11 +293,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
                         break;
                 }
             } else {
-                guideViewParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 guideViewParams.setMargins(offsetX, offsetY, -offsetX, -offsetY);
             }
-
-//            guideViewLayout.addView(customGuideView);
 
             this.addView(customGuideView, guideViewParams);
         }
