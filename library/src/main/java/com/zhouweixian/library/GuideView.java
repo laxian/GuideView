@@ -1,4 +1,4 @@
-package com.example.library;
+package com.zhouweixian.library;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,13 +18,16 @@ import android.widget.RelativeLayout;
 import java.util.List;
 
 /**
- * Created by zhouweixian on 2016/1/23.
+ * Created by zhouweixian on 2016/1/23
  */
 public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlobalLayoutListener {
+
     private final String TAG = getClass().getSimpleName();
+
     private Context mContent;
     private List<View> mViews;
     private boolean first = true;
+
     /**
      * targetView前缀。SHOW_GUIDE_PREFIX + targetView.getId()作为保存在SP文件的key。
      */
@@ -213,7 +216,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         if (hasShown()) return;
 
         if (mShowOnce) {
-            mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).commit();
+            mContent.getSharedPreferences(TAG, Context.MODE_PRIVATE).edit().putBoolean(generateUniqId(targetView), true).apply();
         }
 
         if (targetView != null) {
@@ -454,66 +457,58 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     }
 
     public static class Builder {
-        static GuideView guiderView;
-        static Builder instance = new Builder();
+        GuideView guiderView;
         Context mContext;
-
-        private Builder() {
-        }
 
         public Builder(Context ctx) {
             mContext = ctx;
-        }
-
-        public static Builder newInstance(Context ctx) {
-            guiderView = new GuideView(ctx);
-            return instance;
+            guiderView = new GuideView(mContext);
         }
 
         public Builder setTargetView(View target) {
             guiderView.setTargetView(target);
-            return instance;
+            return this;
         }
 
         public Builder setBgColor(int color) {
             guiderView.setBgColor(color);
-            return instance;
+            return this;
         }
 
         public Builder setDirction(Direction dir) {
             guiderView.setDirection(dir);
-            return instance;
+            return this;
         }
 
         public Builder setDrawRec() {
             guiderView.setDrawRect();
-            return instance;
+            return this;
         }
 
         public Builder setOffset(int x, int y) {
             guiderView.setOffsetX(x);
             guiderView.setOffsetY(y);
-            return instance;
+            return this;
         }
 
         public Builder setRadius(int radius) {
             guiderView.setRadius(radius);
-            return instance;
+            return this;
         }
 
         public Builder setCustomGuideView(View view) {
             guiderView.setCustomGuideView(view);
-            return instance;
+            return this;
         }
 
         public Builder setCenter(int X, int Y) {
             guiderView.setCenter(new int[]{X, Y});
-            return instance;
+            return this;
         }
 
         public Builder showOnce() {
             guiderView.showOnce();
-            return instance;
+            return this;
         }
 
         public GuideView build() {
@@ -523,12 +518,12 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
 
         public Builder setOnclickExit(boolean onclickExit) {
             guiderView.setOnClickExit(onclickExit);
-            return instance;
+            return this;
         }
 
         public Builder setOnclickListener(final OnClickCallback callback) {
             guiderView.setOnclickListener(callback);
-            return instance;
+            return this;
         }
     }
 }

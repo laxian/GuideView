@@ -22,7 +22,7 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         iv.setLayoutParams(params);
 
-![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot1.jpeg)
+![image](https://github.com/laxian/GuideView/blob/develop/sample/snapshot1.jpeg)
 
 ##使用文字
 
@@ -34,7 +34,7 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 
 ##使用矩形效果
 
-![image](https://github.com/laxian/GuideView/blob/develop/app/snapshot3.png)
+![image](https://github.com/laxian/GuideView/blob/develop/sample/snapshot3.png)
 
 ##显示GuideView
 

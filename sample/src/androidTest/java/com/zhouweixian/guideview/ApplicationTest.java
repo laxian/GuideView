@@ -1,4 +1,4 @@
-package com.laxian.guideview;
+package com.zhouweixian.guideview;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

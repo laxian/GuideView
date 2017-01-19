@@ -1,4 +1,4 @@
-package com.laxian.guideview;
+package com.zhouweixian.guideview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.library.GuideView;
+import com.zhouweixian.library.GuideView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,8 +55,7 @@ public class MainActivity extends AppCompatActivity {
         tv2.setGravity(Gravity.CENTER);
 
 
-        guideView = GuideView.Builder
-                .newInstance(this)
+        guideView = new GuideView.Builder(this)
                 .setTargetView(menu)
                 .setCustomGuideView(iv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
@@ -71,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
-        guideView2 = GuideView.Builder
-                .newInstance(this)
+        guideView2 = new GuideView.Builder(this)
                 .setTargetView(btnTest)
                 .setCustomGuideView(tv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
@@ -88,8 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
 
-        guideView3 = GuideView.Builder
-                .newInstance(this)
+        guideView3 = new GuideView.Builder(this)
                 .setTargetView(btnTest2)
                 .setCustomGuideView(tv2)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)

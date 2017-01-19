@@ -1,4 +1,4 @@
-package com.example.library;
+package com.zhouweixian.library;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
