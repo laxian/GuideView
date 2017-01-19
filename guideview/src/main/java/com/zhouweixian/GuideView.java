@@ -1,4 +1,4 @@
-package com.zhouweixian.library;
+package com.zhouweixian;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import com.zhouweixian.library.R;
 
 /**
  * Created by zhouweixian on 2016/1/23

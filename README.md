@@ -13,8 +13,11 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 
 ![image](https://github.com/laxian/GuideView/blob/develop/sample/app.gif)
 
+#gradle引用
+    compile 'com.zhouweixian.guideview:guideview:1.0.0'
 
-##使用图片
+
+##使用图片提示
 
 ```
     ImageView iv = new ImageView(this);
@@ -25,7 +28,7 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 ```
 
 
-##使用文字
+##使用文字提示
 
 ```
     TextView iv = new TextView(this);
@@ -37,11 +40,13 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 ##显示GuideView
 
 ```
-    new GuideView.Builder(this)
+    new GuideView.Builder(getContext())
             .setTargetView(view)    // 必须调用，设置需要Guide的View
-            .setCustomTipsView(iv)  // 必须调用，设置GuideView，可以使任意View的实例，比如ImageView 或者TextView
-            .setDirction(GuideView.Direction.LEFT_BOTTOM)   // 设置GuideView 相对于TargetView的位置，有八种，不设置则默认在屏幕左上角
-            .setBackGround(getResources().getColor(R.color.shadow)) // 设置背景颜色，默认透明
+            .setCustomTipsView(iv)  // 必须调用，设置GuideView
+            // 设置GuideView 相对于TargetView的位置，默认在屏幕左上角
+            .setDirction(GuideView.Direction.LEFT_BOTTOM)   
+            // 设置背景颜色，默认透明
+            .setBackGround(getResources().getColor(R.color.shadow)) 
             .setExitOnclick(null)   // 设置点击消失，可以传入一个Callback，执行被点击后的操作
             .setRadius(32)          // 设置圆形透明区域半径，默认是targetView的显示矩形的半径
             .setCenter(300, 300)    // 设置圆心，默认是targetView的中心

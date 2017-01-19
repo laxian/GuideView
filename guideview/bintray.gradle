@@ -1,0 +1,96 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+// This is the library version used when deploying the artifact
+group = "com.zhouweixian.guideview"
+version = "1.0.0"
+PROJ_DESCRIPTION="一个用于第一次打开页面高亮显示提示信息的view"
+PROJ_WEBSITEURL="https://github.com/laxian/GuideView"
+PROJ_VCSURL="https://github.com/laxian/GuideView.git"
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                description PROJ_DESCRIPTION
+
+                // Add your description here
+                name 'GuideView'
+                url PROJ_WEBSITEURL
+
+                // Set your license
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+//                    license {
+//                        name PROJ_LICENCE_NAME
+//                        url PROJ_LICENCE_URL
+//                        distribution PROJ_LICENCE_DEST
+//                    }
+                }
+                developers {
+                    developer {
+                        id 'free coder'
+                        name 'zhouweixian'
+                        email 'laxian2010@gmail.com'
+                    }
+                }
+                scm {
+                    connection PROJ_VCSURL
+                    developerConnection PROJ_VCSURL
+                    url PROJ_WEBSITEURL
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError = false
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = 'GuideView'
+        websiteUrl = PROJ_WEBSITEURL
+        vcsUrl = PROJ_VCSURL
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            desc = PROJ_DESCRIPTION
+//            gpg {
+//                sign = true //Determines whether to GPG sign the files. The default is false
+//                passphrase = properties.getProperty("bintray.gpg.password")
+//                //Optional. The passphrase for GPG signing'
+//            }
+        }
+    }
+}

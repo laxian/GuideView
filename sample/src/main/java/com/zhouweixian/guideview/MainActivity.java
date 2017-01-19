@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.zhouweixian.library.GuideView;
+import com.zhouweixian.GuideView;
 
 public class MainActivity extends AppCompatActivity {
 
