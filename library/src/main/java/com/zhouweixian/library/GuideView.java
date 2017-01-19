@@ -15,8 +15,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import java.util.List;
-
 /**
  * Created by zhouweixian on 2016/1/23
  */
@@ -25,7 +23,6 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
     private final String TAG = getClass().getSimpleName();
 
     private Context mContent;
-    private List<View> mViews;
     private boolean first = true;
 
     /**

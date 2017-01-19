@@ -1,6 +1,7 @@
 package com.zhouweixian.guideview;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private GuideView guideView;
     private GuideView guideView3;
     private GuideView guideView2;
+    private boolean initGuideView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,14 +45,14 @@ public class MainActivity extends AppCompatActivity {
         // 使用文字
         TextView tv = new TextView(this);
         tv.setText("欢迎使用");
-        tv.setTextColor(getResources().getColor(R.color.white));
+        tv.setTextColor(ContextCompat.getColor(this, R.color.white));
         tv.setTextSize(30);
         tv.setGravity(Gravity.CENTER);
 
         // 使用文字
         final TextView tv2 = new TextView(this);
         tv2.setText("欢迎使用2");
-        tv2.setTextColor(getResources().getColor(R.color.white));
+        tv2.setTextColor(ContextCompat.getColor(this, R.color.white));
         tv2.setTextSize(30);
         tv2.setGravity(Gravity.CENTER);
 
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTargetView(menu)
                 .setCustomGuideView(iv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(getResources().getColor(R.color.shadow))
+                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
                 .setOnclickListener(new GuideView.OnClickCallback() {
                     @Override
                     public void onClickedGuideView() {
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTargetView(btnTest)
                 .setCustomGuideView(tv)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(getResources().getColor(R.color.shadow))
+                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
                 .setDrawRec()
                 .setOnclickListener(new GuideView.OnClickCallback() {
                     @Override
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTargetView(btnTest2)
                 .setCustomGuideView(tv2)
                 .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(getResources().getColor(R.color.shadow))
+                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
                 .setOnclickListener(new GuideView.OnClickCallback() {
                     @Override
                     public void onClickedGuideView() {
@@ -105,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setGuideView();
+        if (!initGuideView) {
+            initGuideView = true;
+            setGuideView();
+        }
     }
 }
