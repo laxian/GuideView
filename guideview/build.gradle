@@ -19,6 +19,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -47,8 +50,8 @@ apply plugin: 'com.novoda.bintray-release'
 publish {
     userOrg = 'laxian2010'
     groupId = 'com.zhouweixian'
-    artifactId = project.name
-    version = '1.0.0'
+    artifactId = rootProject.name
+    version = '1.0.1'
     description = '新手引导视图'
-    website = "https://github.com/laxian/${rootProject} + '/' + ${project.name}"
+    website = "https://github.com/laxian/${rootProject} + '/' + ${rootProject.name}"
 }
