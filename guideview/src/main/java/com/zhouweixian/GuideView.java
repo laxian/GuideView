@@ -10,12 +10,16 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.zhouweixian.library.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zhouweixian on 2016/1/23
@@ -88,8 +92,7 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
      */
     private int[] location;
     private boolean onClickExit;
-    private OnClickCallback onclickListener;
-    private RelativeLayout guideViewLayout;
+    private List<OnClickCallback> onclickListeners = new ArrayList<>();
     private boolean mShowOnce;
     private android.graphics.Rect mTargetViewRect;
     private boolean mDrawRect;
@@ -389,8 +392,8 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         this.onClickExit = onClickExit;
     }
 
-    public void setOnclickListener(OnClickCallback onclickListener) {
-        this.onclickListener = onclickListener;
+    public void addOnclickListener(OnClickCallback onclickListener) {
+        this.onclickListeners.add(onclickListener);
     }
 
     private void setClickInfo() {
@@ -398,8 +401,10 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onclickListener != null) {
-                    onclickListener.onClickedGuideView();
+                if (onclickListeners != null && onclickListeners.size() > 0) {
+                    for (OnClickCallback listener : onclickListeners) {
+                        listener.onClicked();
+                    }
                 }
                 if (exit) {
                     hide();
@@ -452,76 +457,93 @@ public class GuideView extends RelativeLayout implements ViewTreeObserver.OnGlob
      * GuideView点击Callback
      */
     public interface OnClickCallback {
-        void onClickedGuideView();
+        void onClicked();
     }
 
     public static class Builder {
-        GuideView guiderView;
+        GuideView guideView;
         Context mContext;
 
         public Builder(Context ctx) {
             mContext = ctx;
-            guiderView = new GuideView(mContext);
+            guideView = new GuideView(mContext);
         }
 
-        public Builder setTargetView(View target) {
-            guiderView.setTargetView(target);
+        public Builder target(View target) {
+            guideView.setTargetView(target);
             return this;
         }
 
-        public Builder setBgColor(int color) {
-            guiderView.setBgColor(color);
+        public Builder guide(View view) {
+            guideView.setCustomGuideView(view);
             return this;
         }
 
-        public Builder setDirction(Direction dir) {
-            guiderView.setDirection(dir);
+        public Builder guide(int viewId) {
+            View view = LayoutInflater.from(mContext).inflate(viewId, null);
+            guideView.setCustomGuideView(view);
             return this;
         }
 
-        public Builder setDrawRec() {
-            guiderView.setDrawRect();
+        public Builder bgcolor(int color) {
+            guideView.setBgColor(color);
             return this;
         }
 
-        public Builder setOffset(int x, int y) {
-            guiderView.setOffsetX(x);
-            guiderView.setOffsetY(y);
+        public Builder direction(Direction dir) {
+            guideView.setDirection(dir);
             return this;
         }
 
-        public Builder setRadius(int radius) {
-            guiderView.setRadius(radius);
+        public Builder drawRect() {
+            guideView.setDrawRect();
             return this;
         }
 
-        public Builder setCustomGuideView(View view) {
-            guiderView.setCustomGuideView(view);
+        public Builder offset(int x, int y) {
+            guideView.setOffsetX(x);
+            guideView.setOffsetY(y);
             return this;
         }
 
-        public Builder setCenter(int X, int Y) {
-            guiderView.setCenter(new int[]{X, Y});
+        public Builder radius(int radius) {
+            guideView.setRadius(radius);
+            return this;
+        }
+
+        public Builder center(int X, int Y) {
+            guideView.setCenter(new int[]{X, Y});
             return this;
         }
 
         public Builder showOnce() {
-            guiderView.showOnce();
+            guideView.showOnce();
             return this;
         }
 
         public GuideView build() {
-            guiderView.setClickInfo();
-            return guiderView;
+            guideView.setClickInfo();
+            return guideView;
         }
 
-        public Builder setOnclickExit(boolean onclickExit) {
-            guiderView.setOnClickExit(onclickExit);
+        public Builder exitOnClick(boolean onclickExit) {
+            guideView.setOnClickExit(onclickExit);
             return this;
         }
 
-        public Builder setOnclickListener(final OnClickCallback callback) {
-            guiderView.setOnclickListener(callback);
+        public Builder onclick(final OnClickCallback callback) {
+            guideView.addOnclickListener(callback);
+            return this;
+        }
+
+        public Builder after(final GuideView preView) {
+            preView.addOnclickListener(new OnClickCallback() {
+                @Override
+                public void onClicked() {
+                    preView.hide();
+                    guideView.show();
+                }
+            });
             return this;
         }
     }

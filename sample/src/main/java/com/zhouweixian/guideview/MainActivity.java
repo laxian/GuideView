@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -36,70 +38,30 @@ public class MainActivity extends AppCompatActivity {
 
     private void setGuideView() {
 
-        // 使用图片
-        final ImageView iv = new ImageView(this);
-        iv.setImageResource(R.drawable.img_new_task_guide);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        iv.setLayoutParams(params);
-
-        // 使用文字
-        TextView tv = new TextView(this);
-        tv.setText("欢迎使用");
-        tv.setTextColor(ContextCompat.getColor(this, R.color.white));
-        tv.setTextSize(30);
-        tv.setGravity(Gravity.CENTER);
-
-        // 使用文字
-        final TextView tv2 = new TextView(this);
-        tv2.setText("欢迎使用2");
-        tv2.setTextColor(ContextCompat.getColor(this, R.color.white));
-        tv2.setTextSize(30);
-        tv2.setGravity(Gravity.CENTER);
-
-
         guideView = new GuideView.Builder(this)
-                .setTargetView(menu)
-                .setCustomGuideView(iv)
-                .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
-                .setOnclickListener(new GuideView.OnClickCallback() {
-                    @Override
-                    public void onClickedGuideView() {
-                        guideView.hide();
-                        guideView2.show();
-                    }
-                })
+                .target(menu)
+                .guide(R.layout.guide_iv)
+                .direction(GuideView.Direction.LEFT_BOTTOM)
+                .bgcolor(ContextCompat.getColor(this, R.color.shadow))
                 .build();
-
 
         guideView2 = new GuideView.Builder(this)
-                .setTargetView(btnTest)
-                .setCustomGuideView(tv)
-                .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
-                .setDrawRec()
-                .setOnclickListener(new GuideView.OnClickCallback() {
-                    @Override
-                    public void onClickedGuideView() {
-                        guideView2.hide();
-                        guideView3.show();
-                    }
-                })
+                .target(btnTest)
+                .guide(R.layout.guide_tv)
+                .direction(GuideView.Direction.LEFT_BOTTOM)
+                .bgcolor(ContextCompat.getColor(this, R.color.shadow))
+                .drawRect()
+                .after(guideView)
                 .build();
 
-
         guideView3 = new GuideView.Builder(this)
-                .setTargetView(btnTest2)
-                .setCustomGuideView(tv2)
-                .setDirction(GuideView.Direction.LEFT_BOTTOM)
-                .setBgColor(ContextCompat.getColor(this, R.color.shadow))
-                .setOnclickListener(new GuideView.OnClickCallback() {
-                    @Override
-                    public void onClickedGuideView() {
-                        guideView3.hide();
-                        guideView.show();
-                    }
-                })
+                .target(btnTest2)
+                .guide(R.layout.guide_custom)
+                .direction(GuideView.Direction.LEFT)
+                .offset(-10, 0)
+                .bgcolor(ContextCompat.getColor(this, R.color.shadow))
+                .after(guideView2)
+                .exitOnClick(true)
                 .build();
         guideView.show();
     }

@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -29,5 +29,26 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.5.0'
+    }
+}
+
+
 //配置插件
-apply from: './bintray.gradle'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'laxian2010'
+    groupId = 'com.zhouweixian'
+    artifactId = project.name
+    version = '1.0.0'
+    description = '新手引导视图'
+    website = "https://github.com/laxian/${rootProject} + '/' + ${project.name}"
+}
