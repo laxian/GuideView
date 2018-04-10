@@ -1,7 +1,7 @@
-## GuideView
+# GuideView
 新手引导视图，初次打开页面时显示的引导性图文
 
-##功能简介
+## 功能简介
 *GuideView*能通过获取targetView的坐标和大小，动态的绘图，来高亮显示targetView 。targetView可以用圆形或者矩形圈出，
 其他区域设置自定义的背景色。确定targetView之后，可以在targetView的上下左右以及左上、左下、右上、右下等八个区域添加一个说明性的
 tipsView，可以是带有引导语的ImageView，也可以是带文字的TextView等。*GuideView*同样可以用于引导ListView里的某一项。
@@ -13,11 +13,11 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 
 ![image](https://github.com/laxian/GuideView/blob/develop/sample/app.gif)
 
-#gradle引用
+## gradle引用
     compile 'com.zhouweixian.guideview:guideview:1.0.0'
 
 
-##使用图片提示
+## 使用图片提示
 
 ```
     ImageView iv = new ImageView(this);
@@ -28,7 +28,7 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 ```
 
 
-##使用文字提示
+## 使用文字提示
 
 ```
     TextView iv = new TextView(this);
@@ -37,7 +37,7 @@ tipsView，可以是带有引导语的ImageView，也可以是带文字的TextVi
 ```
 
 
-##显示GuideView
+## 显示GuideView
 
 ```
     new GuideView.Builder(getContext())
